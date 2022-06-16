@@ -1,0 +1,114 @@
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+const long long INF = 100000000000;
+const long long large_prime = 1000000007;
+using ll = long long;
+using ld = long double;
+ 
+#define PI 3.14
+#define ff first
+#define ss second
+#define pb push_back
+#define initialize(a,b) memset(a,b,sizeof(a))
+#define endl "\n"
+#define all(v) (v).begin(),(v).end()
+ 
+ 
+bool is_persq(ll a){
+    if(floor(sqrt(a))==ceil(sqrt(a))){return 1;}
+    else{return 0;}
+    }
+bool is_int(double a){
+    if(floor((a))==ceil(a)){return 1;}
+    else{return 0;}
+    }    
+long long int power(ll a, ll b){
+    ll temp;
+    if(b==0){return 1;}
+    temp = power(a,b/2)%large_prime; 
+    if(b%2==0){return (temp*temp)%large_prime;}
+    else {return (((a*temp)%large_prime)*temp)%large_prime;}}
+void fastIO(){ 
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);} 
+bool sortbysecdesc(const pair<ll,ll> &a, const pair<ll,ll> &b) {
+       if(a.first==b.first)
+            return a.second<b.second;
+       return a.first > b.first;}
+vector<ll> sieve(ll n) {ll*arr = new ll[n + 1](); vector<ll> vect; for (ll i = 2; i <= n; i++)if (arr[i] == 0) {vect.push_back(i); for (ll j = (ll(i) * ll(i)); j <= n; j += i)arr[j] = 1;} return vect;}
+ 
+ 
+int LIS(vector<int> &a)
+{
+    vector<int> lis; lis.reserve(a.size());
+    for(auto &x: a)
+    {
+        auto it = upper_bound(lis.begin(), lis.end(), x);  // upper_bound for non-decreasing
+        if(it == lis.end())
+            lis.push_back(x);
+        else
+            *it = x;
+    }
+    return lis.size();    
+}
+ 
+int dp[100+1][100000+1];
+ 
+ 
+ 
+ 
+int main(){ 
+ 
+fastIO();
+ 
+    int n;
+    cin>>n;
+    int arr[n];
+ 
+    int sum=0;
+ 
+    for(int i=0;i<n;i++){cin>>arr[i];sum+=arr[i];}
+ 
+ 
+ 
+    for(int i=0;i<=n;i++){
+        for(int j=0;j<=sum;j++){
+ 
+            if(i==0){continue;}
+ 
+            else if(j==arr[i-1]){dp[i][j]=1;}
+ 
+            else {  if(j>arr[i-1]){ dp[i][j] = max(  dp[i-1][j-arr[i-1]] , dp [i-1][j]); }
+                    else{dp[i][j]= dp[i-1][j];}
+                                    }
+ 
+ 
+ 
+        }
+    }
+ 
+    set<int> s;
+ 
+    for(int i =0;i<=n;i++){
+            for(int j=0;j<=sum;j++){
+ 
+                if(dp[i][j]==1){s.insert(j);}
+            }
+ 
+    }
+    cout<<s.size()<<endl;
+    for(int x : s){
+        cout<<x<<" ";
+    }
+ 
+ 
+ 
+ 
+ 
+ 
+}
+ 
+ 
+ 

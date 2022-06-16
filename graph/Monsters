@@ -1,0 +1,256 @@
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+const long long INF = 100000000000;
+const long long large_prime = 998244353;
+using ll = long long;
+using ld = long double;
+ 
+#define ff first
+#define ss second
+#define pb push_back
+#define mp make_pair
+#define endl "\n"
+#define all(v) (v).begin(),(v).end()
+#define set_bits __builtin_popcountll
+ 
+ 
+ 
+#ifndef ONLINE_JUDGE
+#define dbg(a) cerr << endl; cerr << #a << ": "; _print(a); cerr << endl << endl;
+#else
+#define dbg(a)
+#endif
+void _print(ll t) {cerr << t;}
+void _print(int t) {cerr << t;}
+void _print(string t) {cerr << t;}
+void _print(char t) {cerr << t;}
+void _print(double t) {cerr << t;}
+template <class T, class V> void _print(pair <T, V> p);
+template <class T> void _print(vector <T> v);
+template <class T> void _print(set <T> v);
+template <class T, class V> void _print(map <T, V> v);
+template <class T> void _print(multiset <T> v);
+template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.fs); cerr << ","; _print(p.sn); cerr << "}";}
+template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(unordered_map <T, V> umap) {cerr << "{ "; for(auto i : umap) {cerr << "{";_print(i.fs); cerr << ", "; _print(i.sn); cerr << "} ";} cerr << "}";}
+ 
+ 
+ 
+bool is_persq(ll a){
+    if(floor(sqrt(a))==ceil(sqrt(a))){return 1;}
+    else{return 0;}
+    }
+bool is_int(double a){
+    if(floor((a))==ceil(a)){return 1;}
+    else{return 0;}
+    }    
+long long int power(ll a, ll b){
+    ll temp;
+    if(b==0){return 1;}
+    temp = power(a,b/2)%large_prime; 
+    if(b%2==0){return (temp*temp)%large_prime;}
+    else {return (((a*temp)%large_prime)*temp)%large_prime;}}
+void fastIO(){ 
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);} 
+    
+bool sortbysecdesc(const pair<ll,ll> &a, const pair<ll,ll> &b) {
+       if(a.first==b.first)
+            return b.second<a.second;
+       return a.first > b.first;}
+vector<ll> sieve(ll n) {ll*arr = new ll[n + 1](); vector<ll> vect; for (ll i = 2; i <= n; i++)if (arr[i] == 0) {vect.push_back(i); for (ll j = (ll(i) * ll(i)); j <= n; j += i)arr[j] = 1;} return vect;}
+ 
+ 
+int LIS(vector<int> &a)
+{
+    vector<int> lis; lis.reserve(a.size());
+    for(auto &x: a)
+    {
+        auto it = upper_bound(lis.begin(), lis.end(), x);  // upper_bound for non-decreasing
+        if(it == lis.end())
+            lis.push_back(x);
+        else
+            *it = x;
+    }
+    return lis.size();    
+}
+ 
+ 
+int p[100005];
+int sizes[100005];
+ 
+ 
+int get(int a ){
+    return p[a]=(p[a]==a ? a : get(p[a]));}
+ 
+void merge(int a, int b) {
+    a = get(a);
+    b = get(b);
+    if (a != b) {
+        if (sizes[a] < sizes[b])
+            swap(a, b);
+        p[b] = a;
+        sizes[a] += sizes[b];
+     
+    }
+}
+ 
+ 
+int r, c;
+ 
+bool isvalid( int x , int y, vector<vector<char>> &graph  ){
+    
+    if(x>=0 && x < r && y >=0 && y < c && (graph[x][y]=='.' || graph[x][y]=='A')){
+        return 1;
+    } 
+    return 0;
+    
+}
+ 
+ int dx[]={0,0,1,-1};
+ int dy[]={1,-1,0,0};
+ string ds="RLDU";
+ 
+int main(){ 
+ 
+fastIO();
+ 
+cin>>r>>c;
+ 
+ 
+ int tx = -1;
+ int ty  =  -1;
+vector<vector<char>> graph(r,vector<char>(c));
+vector<vector<bool>> vis(r,vector<bool>(c));
+vector<vector<bool>> visc(r,vector<bool>(c));
+vector<vector<int>> dism(r,vector<int>(c,1000000000));
+vector<vector<int>> disc(r,vector<int>(c,1000000000));
+ 
+ 
+for(int i=0;i<r;i++){
+    for(int j=0;j<c;j++){
+        cin>>graph[i][j];
+    }
+}
+ 
+queue<pair<int,int>> q;
+ 
+for(int i=0;i<r;i++){
+    for(int j=0;j<c;j++){
+        if(graph[i][j]=='M'){
+            q.push(mp(i,j));
+            vis[i][j]=1;
+            dism[i][j]=0;
+        }
+    }
+}
+ 
+while(!q.empty()){
+   int xx= q.front().ff;
+   int yy = q.front().ss;
+   q.pop();
+   for(int i=0;i<=3;i++) {
+    if(isvalid(xx+dx[i],yy+dy[i],graph) ) {
+       if(!vis[xx+dx[i]][yy+dy[i]]){  dism[xx+dx[i]][yy+dy[i]]=min(dism[xx][yy]+1,dism[xx+dx[i]][yy+dy[i]]);
+                                        
+                                      q.push(mp(xx+dx[i],yy+dy[i]));
+                                      vis[xx+dx[i]][yy+dy[i]]=1;}
+    } 
+  }  
+ }
+ 
+ 
+ 
+int ax=-1;
+int ay=-1;
+ for(int i=0;i<r;i++){
+    for(int j=0;j<c;j++){
+        if(graph[i][j]=='A'){
+            ax=i;
+            ay=j;
+            q.push(mp(i,j));
+            visc[i][j]=1;
+            disc[i][j]=0;
+        }
+    }
+}
+ 
+ 
+pair<int,int> from[r][c];
+vector<vector<char>> path(r,vector<char>(c,'1'));
+ 
+ 
+while(!q.empty()){
+   int xx= q.front().ff;
+   int yy = q.front().ss;
+   q.pop();
+   for(int i=0;i<=3;i++) {
+    if(isvalid(xx+dx[i],yy+dy[i],graph) ) {
+       if(!visc[xx+dx[i]][yy+dy[i]]){  disc[xx+dx[i]][yy+dy[i]]=min(disc[xx][yy]+1,disc[xx+dx[i]][yy+dy[i]]);
+                                        if( disc[xx+dx[i]][yy+dy[i]] < dism[xx+dx[i]][yy+dy[i]] ){
+                                            from[xx+dx[i]][yy+dy[i]]=mp(xx,yy);
+                                            path[xx+dx[i]][yy+dy[i]]=ds[i];
+                                            q.push(mp(xx+dx[i],yy+dy[i]));
+                                            visc[xx+dx[i]][yy+dy[i]]=1;
+                                        }
+                                      
+                                      }
+    } 
+  }  
+ }
+ 
+ for(int i=0;i<r;i++){
+    if(visc[i][0] && disc[i][0] < dism[i][0]){
+        tx=i;
+        ty=0;
+    }
+    
+     if(visc[i][c-1] && disc[i][c-1] < dism[i][c-1]){
+        tx=i;
+        ty=c-1;
+    }
+ }
+ 
+ for(int i=0;i<c;i++){
+    if(visc[0][i] && disc[0][i] < dism[0][i]){
+        tx=0;
+        ty=i;
+    }
+    
+     if(visc[r-1][i] && disc[r-1][i] < dism[r-1][i]){
+        tx=r-1;
+        ty=i;
+    }
+ }
+ 
+ if(tx==-1 && ty==-1){cout<<"NO";}
+ 
+ else{
+    cout<<"YES\n";
+    cout<<disc[tx][ty]<<endl;
+    
+   
+    string temp="";
+ 
+ 
+    while( tx !=ax || ty!=ay){
+         temp+=path[tx][ty];
+        int xxx = from[tx][ty].ff;
+        int yyy =  from[tx][ty].ss;
+        
+        tx=xxx;
+        ty=yyy;
+    
+    }
+    reverse(all(temp));
+    cout<<temp<<endl;
+ 
+ 
+ }
+ 
+}

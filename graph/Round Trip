@@ -1,0 +1,254 @@
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+const long long INF = 100000000000;
+const long long large_prime = 998244353;
+using ll = long long;
+using ld = long double;
+ 
+#define ff first
+#define ss second
+#define pb push_back
+#define mp make_pair
+#define endl "\n"
+#define all(v) (v).begin(),(v).end()
+#define set_bits __builtin_popcountll
+ 
+ 
+ 
+#ifndef ONLINE_JUDGE
+#define dbg(a) cerr << endl; cerr << #a << ": "; _print(a); cerr << endl << endl;
+#else
+#define dbg(a)
+#endif
+void _print(ll t) {cerr << t;}
+void _print(int t) {cerr << t;}
+void _print(string t) {cerr << t;}
+void _print(char t) {cerr << t;}
+void _print(double t) {cerr << t;}
+template <class T, class V> void _print(pair <T, V> p);
+template <class T> void _print(vector <T> v);
+template <class T> void _print(set <T> v);
+template <class T, class V> void _print(map <T, V> v);
+template <class T> void _print(multiset <T> v);
+template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.ff); cerr << ","; _print(p.ss); cerr << "}";}
+template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(unordered_map <T, V> umap) {cerr << "{ "; for(auto i : umap) {cerr << "{";_print(i.fs); cerr << ", "; _print(i.sn); cerr << "} ";} cerr << "}";}
+ 
+ 
+ 
+bool is_persq(ll a){
+    if(floor(sqrt(a))==ceil(sqrt(a))){return 1;}
+    else{return 0;}
+    }
+bool is_int(double a){
+    if(floor((a))==ceil(a)){return 1;}
+    else{return 0;}
+    }    
+long long int power(ll a, ll b){
+    ll temp;
+    if(b==0){return 1;}
+    temp = power(a,b/2)%large_prime; 
+    if(b%2==0){return (temp*temp)%large_prime;}
+    else {return (((a*temp)%large_prime)*temp)%large_prime;}}
+void fastIO(){ 
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);} 
+    
+bool sortbysecdesc(const pair<pair<ll,ll>,ll> &a, const pair<pair<ll,ll>,ll> &b) {
+       if(a.first.second==b.first.second)
+            return b.first.first>a.first.first;
+       return b.first.second > a.first.second;}
+vector<ll> sieve(ll n) {ll*arr = new ll[n + 1](); vector<ll> vect; for (ll i = 2; i <= n; i++)if (arr[i] == 0) {vect.push_back(i); for (ll j = (ll(i) * ll(i)); j <= n; j += i)arr[j] = 1;} return vect;}
+ 
+ 
+int LIS(vector<int> &a)
+{
+    vector<int> lis; lis.reserve(a.size());
+    for(auto &x: a)
+    {
+        auto it = upper_bound(lis.begin(), lis.end(), x);  // upper_bound for non-decreasing
+        if(it == lis.end())
+            lis.push_back(x);
+        else
+            *it = x;
+    }
+    return lis.size();    
+}
+ 
+ 
+int p[100005];
+int sizes[100005];
+ 
+ 
+int get(int a ){
+    return p[a]=(p[a]==a ? a : get(p[a]));}
+ 
+void merge(int a, int b) {
+    a = get(a);
+    b = get(b);
+    if (a != b) {
+        if (sizes[a] < sizes[b])
+            swap(a, b);
+        p[b] = a;
+        sizes[a] += sizes[b];
+     
+    }
+}
+ 
+ll binarySearch( vector<ll> v , int l, int r, ll x)
+{
+    if (r >= l) {
+        int mid = l + (r - l) / 2;
+  
+      
+        if (v[mid] == x)
+            return mid;
+        
+        if (v[mid] > x)
+            return binarySearch(v, l, mid - 1, x);
+  
+        return binarySearch(v, mid + 1, r, x);
+    }
+  
+    return -1LL;
+}
+ 
+struct interval{
+    ll start;
+    ll end;
+    ll cost;
+ 
+};
+ 
+struct compare1{
+bool operator() ( const interval& p1, const interval& p2 ) {
+    
+       if(p1.start == p2.start){
+            if(p1.cost==p2.cost){
+                    return p1.end < p2.end;
+                }
+            return p1.cost > p2.cost;}
+        
+     
+        
+       return p1.start > p2.start;}
+       
+};
+ 
+struct compare2{
+bool operator() ( const interval& p1, const interval& p2 ) {
+    
+       if(p1.end == p2.end){
+                if(p1.cost==p2.cost){
+                    return p1.start > p2.start;
+                }
+            return p1.cost > p2.cost;}
+        
+       return p1.end < p2.end;}
+       
+};
+ 
+int ans =-1;
+ 
+ 
+int start=-1;
+int end_cycle =-1;
+ 
+bool dfs( int curr, vector<int>&color, vector<int> adj[] , vector<int>& parent){
+  color[curr] = 1;
+  for(int x : adj[curr] )
+    { 
+    
+      if(color[x]==0){ 
+            dbg(x)
+             parent[x] = curr;
+             if( dfs(x,color,adj,parent) ){return 1;}} 
+             
+      else if(x!= parent[curr] && color[x]==1){
+            start = x;
+            end_cycle = curr; 
+           return 1;
+        }
+    }
+    
+  color[curr]=2;
+  return 0;  
+ }
+ 
+int main(){ 
+ int n, m;
+ cin>>n>>m;
+ vector<int> adj[n+1];
+ vector<int> vis(n+1,0);
+ vector<int> parent(n+1,-1);
+ 
+ while(m--){
+    int a,b;
+    cin>>a>>b;
+    adj[a].pb(b);
+    adj[b].pb(a);
+ 
+ }
+ bool possible =0;
+ 
+for(int i=1;i<=n;i++){
+    
+   if(vis[i]==0 && dfs(i,vis,adj,parent)){
+          possible =1; break;
+            }
+    }
+ 
+if(possible){
+    vector<int>path; 
+   
+    int temp =end_cycle;
+    path.pb(start);
+    
+     while(temp!=start){
+        path.pb(temp);
+        temp=parent[temp];
+}  
+ 
+ 
+path.pb(path[0]);
+cout<<path.size()<<endl;
+for(auto x : path){cout<<x<<" ";
+}
+   
+   
+}
+else{cout<<"IMPOSSIBLE"<<endl;}
+ 
+ 
+ 
+    
+dbg(parent)
+dbg(vis)
+dbg(possible)
+dbg(start)
+dbg(end_cycle)
+ 
+ 
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

@@ -1,0 +1,177 @@
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+const long long INF = 100000000000000000;
+const long long large_prime = 1000000007;
+using ll = long long;
+using ld = long double;
+ 
+#define ff first
+#define ss second
+#define pb push_back
+#define mp make_pair
+#define endl "\n"
+#define all(v) (v).begin(),(v).end()
+#define set_bits __builtin_popcountll
+ 
+ 
+ 
+#ifndef ONLINE_JUDGE
+#define dbg(a) cerr << endl; cerr << #a << ": "; _print(a); cerr << endl << endl;
+#else
+#define dbg(a)
+#endif
+void _print(ll t) {cerr << t;}
+void _print(int t) {cerr << t;}
+void _print(string t) {cerr << t;}
+void _print(char t) {cerr << t;}
+void _print(double t) {cerr << t;}
+template <class T, class V> void _print(pair <T, V> p);
+template <class T> void _print(vector <T> v);
+template <class T> void _print(set <T> v);
+template <class T, class V> void _print(map <T, V> v);
+template <class T> void _print(multiset <T> v);
+template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.ff); cerr << ","; _print(p.ss); cerr << "}";}
+template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(unordered_map <T, V> umap) {cerr << "{ "; for(auto i : umap) {cerr << "{";_print(i.fs); cerr << ", "; _print(i.sn); cerr << "} ";} cerr << "}";}
+ 
+ 
+ 
+bool is_persq(ll a){
+    if(floor(sqrt(a))==ceil(sqrt(a))){return 1;}
+    else{return 0;}
+    }
+bool is_int(double a){
+    if(floor((a))==ceil(a)){return 1;}
+    else{return 0;}
+    }    
+long long int power(ll a, ll b){
+    ll temp;
+    if(b==0){return 1;}
+    temp = power(a,b/2)%large_prime; 
+    if(b%2==0){return (temp*temp)%large_prime;}
+    else {return (((a*temp)%large_prime)*temp)%large_prime;}}
+    
+void fastIO(){ 
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);} 
+    
+ 
+vector<ll> sieve(ll n) {ll*arr = new ll[n + 1](); vector<ll> vect; for (ll i = 2; i <= n; i++)if (arr[i] == 0) {vect.push_back(i); for (ll j = (ll(i) * ll(i)); j <= n; j += i)arr[j] = 1;} return vect;}
+ 
+ 
+int LIS(vector<int> &a)
+{
+    vector<int> lis; lis.reserve(a.size());
+    for(auto &x: a)
+    {
+        auto it = upper_bound(lis.begin(), lis.end(), x);  // upper_bound for non-decreasing
+        if(it == lis.end())
+            lis.push_back(x);
+        else
+            *it = x;
+    }
+    return lis.size();    
+}
+ 
+ 
+int p[100005];
+int sizes[100005];
+ 
+ 
+int get(int a ){
+    return p[a]=(p[a]==a ? a : get(p[a]));}
+ 
+void merge(int a, int b) {
+    a = get(a);
+    b = get(b);
+    if (a != b) {
+        if (sizes[a] < sizes[b])
+            swap(a, b);
+        p[b] = a;
+        sizes[a] += sizes[b];
+     
+    }
+}
+ 
+ 
+ 
+struct edge{
+    ll start;
+    ll end;
+    ll cost;
+ 
+};
+ 
+ 
+bool sortbysecdesc(const pair<pair<ll,ll>,ll> &a, const pair<pair<ll,ll>,ll> &b) {
+       if(a.first.second==b.first.second)
+            return b.first.first>a.first.first;
+       return b.first.second > a.first.second;}
+       
+       
+struct compare {
+    bool operator() (const pair<int,int>& x, const pair<int,int>& y) const {
+         if(x.first==y.first)
+            return x.second>y.second;
+       return x.first> y.first;}
+    }
+;
+ 
+int C(int n, int k) {
+    double res = 1;
+    for (int i = 1; i <= k; ++i)
+        res = res * (n - k + i) / i;
+    return (int)(res + 0.01);
+}
+ 
+ 
+// i%2==0  4 {2,2  1,3  3,1  4,0  0,4  }  {5,9  6,8  7,7 8,6 9,5}
+// i%2==1  5 {1,4  4,1 2,3 3,2 5,0  0,5}  {6,9  9,6  8,7 7,8  }
+ 
+ 
+int main(){ 
+    fastIO();
+    int n;
+    cin>>n;
+    
+    char graph[n][n];
+    
+    int dp[n][n]={};
+    
+    
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cin>>graph[i][j];
+        }
+    }
+    
+    dp[n-1][n-1]=(graph[n-1][n-1]=='.')?1:0;
+    
+    
+    for(int i=n-1;i>=0;i--){
+        for(int j=n-1;j>=0;j--){
+            
+            if(i==n-1 && j==n-1){continue;}
+            if(graph[i][j]=='.'){
+            dp[i][j] =  ((j+1<n ) ? dp[i][j+1]%large_prime:0) + ((i+1<n) ? dp[i+1][j]%large_prime : 0);}
+            dp[i][j]%=large_prime;
+            //cout<<i<< " "<<j <<" "<<dp[i][j]<<endl;
+        }
+    }
+    
+    cout<<dp[0][0]<<endl;
+        
+    
+ 
+  }
+    
+ 
+ 
+     
+    
+    
